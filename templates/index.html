@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 Home Price Predictor 🏡</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #e6f9e6; /* Fresh Light Green! 💚 */
+            --main-bg: #e9ecef;
+            --card-bg: #ffffff; /* Default card color */
+            --input-card-bg: #fff5e6; /* Cozy Peach for the input card! 🍑 */
+            --primary-color: #4d994d; /* Dark Green to match the theme */
+            --secondary-color: #6c757d;
+            --text-color: #343a40;
+            --border-color: #dee2e6;
+            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-dark: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 20px 40px;
+            box-shadow: var(--shadow-light);
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+            gap: 30px;
+            min-height: calc(100vh - 84px);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-dark);
+            padding: 30px;
+        }
+
+        .input-card {
+            flex: 1;
+            min-width: 400px;
+            background-color: var(--input-card-bg); /* Applying the peach color! */
+        }
+
+        .result-card {
+            flex: 1;
+            min-width: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        input[type="number"], input[type="range"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(77, 153, 77, 0.25);
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .slider-group input[type="range"] {
+            -webkit-appearance: none;
+            height: 8px;
+            background: var(--border-color);
+            cursor: pointer;
+            border-radius: 4px;
+            flex-grow: 1;
+            margin-right: 15px;
+        }
+        
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid var(--input-card-bg);
+            transition: background 0.3s ease;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            margin-right: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .checkbox-item input[type="checkbox"]:checked::after {
+            content: '✔';
+            color: white;
+            font-size: 14px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #3d7a3d;
+        }
+        
+        #result-container {
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        #result-container.hidden {
+            display: none;
+        }
+        
+        #price-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 10px;
+            letter-spacing: -1px;
+        }
+        
+        #result-label {
+            font-size: 20px;
+            color: var(--secondary-color);
+        }
+
+        #error-message {
+            color: #dc3545;
+            font-weight: 500;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        #chart-container {
+            width: 100%;
+            height: 250px;
+            margin-top: 20px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 20px;
+        }
+
+        #summary-section {
+            text-align: left;
+            margin-top: 20px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 20px;
+        }
+
+        #summary-section h3 {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        #summary-section p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🏠 Home Price Predictor 🏡</h1>
+    </div>
+
+    <div class="main-container">
+        <div class="card input-card">
+            <h2>Property Details 🏠</h2>
+            <form id="prediction-form">
+                
+                <div class="form-group">
+                    <label for="square_feet">Square Feet 📐</label>
+                    <div class="slider-group">
+                        <input type="range" id="square_feet" name="square_feet" min="500" max="8000" value="2500" oninput="updateSliderValue('sqft-value', this.value)">
+                        <span class="slider-value" id="sqft-value">2500</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bedrooms">Bedrooms 🛏</label>
+                    <input type="number" id="bedrooms" name="bedrooms" min="1" max="10" value="3" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="toilets">Toilets 🚽</label>
+                    <input type="number" id="toilets" name="toilets" min="1" max="5" value="2" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age (in years) 📅</label>
+                    <div class="slider-group">
+                        <input type="range" id="age" name="age" min="0" max="100" value="25" oninput="updateSliderValue('age-value', this.value)">
+                        <span class="slider-value" id="age-value">25</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">City Type 🏙</label>
+                    <select id="city" name="city">
+                        <option value="urban">Urban</option>
+                        <option value="suburban">Suburban</option>
+                        <option value="rural">Rural</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Amenities 🔑</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="garage" name="garage">
+                            <label for="garage">Garage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="swimming_pool" name="swimming_pool">
+                            <label for="swimming_pool">Swimming Pool</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="fireplace" name="fireplace">
+                            <label for="fireplace">Fireplace</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="garden" name="garden">
+                            <label for="garden">Garden</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit">Predict Price</button>
+            </form>
+        </div>
+
+        <div class="card result-card">
+            <div id="result-container" class="hidden">
+                <p id="result-label">Estimated Home Price</p>
+                <p id="price-display"></p>
+                <div id="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+                <div id="summary-section">
+                    <h3>Prediction Summary</h3>
+                    <p>
+                        Based on your property's features, the estimated price is in line with recent sales in similar neighborhoods.
+                        Properties with a swimming pool and garage tend to have higher value.
+                    </p>
+                    <p>
+                        The age of the property has a minor negative impact on price, which is typical for the local market.
+                    </p>
+                </div>
+            </div>
+            <div id="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        function updateSliderValue(elementId, value) {
+            document.getElementById(elementId).textContent = value;
+        }
+
+        let priceChart;
+
+        document.getElementById('prediction-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const resultContainer = document.getElementById('result-container');
+            const priceDisplay = document.getElementById('price-display');
+            const errorMessage = document.getElementById('error-message');
+
+            resultContainer.classList.add('hidden');
+            errorMessage.textContent = '';
+            priceDisplay.textContent = '';
+            
+            if (priceChart) {
+                priceChart.destroy();
+            }
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    errorMessage.textContent = 'Error: ' + data.error;
+                } else {
+                    priceDisplay.textContent = data.prediction;
+                    resultContainer.classList.remove('hidden');
+                    
+                    const squareFeet = parseInt(formData.get('square_feet'));
+                    
+                    const labels = [squareFeet - 500, squareFeet, squareFeet + 500];
+                    const dataPoints = labels.map(sqft => {
+                        const basePrice = parseFloat(data.prediction.replace(/[^0-9.]/g, ''));
+                        return basePrice + (sqft - squareFeet) * 100;
+                    });
+
+                    const ctx = document.getElementById('priceChart').getContext('2d');
+                    priceChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Price vs Square Feet',
+                                data: dataPoints,
+                                backgroundColor: '#1a4175', // Dark Blue
+                                borderColor: '#153660',
+                                borderWidth: 1,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Square Feet'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Price ($)'
+                                    },
+                                    ticks: {
+                                        callback: function(value, index, ticks) {
+                                            return '$' + value.toLocaleString();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+            });
+        });
+    </script>
+</body>
+</html>
